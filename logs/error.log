@@ -1,0 +1,106 @@
+2019/01/09 15:56:33 [error] 10792#6848: *1 lua entry thread aborted: runtime error: ./lualib/resty\redis.lua:58: attempt to call upvalue 'tcp' (a nil value)
+stack traceback:
+coroutine 0:
+	./lualib/resty\redis.lua: in function 'new'
+	E:/workspace/glory-openresty/src/api.lua:4: in function 'connect_redis'
+	E:/workspace/glory-openresty/src/api.lua:48: in function 'check_token'
+	E:/workspace/glory-openresty/src/api.lua:66: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 16:07:06 [error] 11040#10848: *4 lua entry thread aborted: runtime error: ./lualib/resty\redis.lua:58: attempt to call upvalue 'tcp' (a nil value)
+stack traceback:
+coroutine 0:
+	./lualib/resty\redis.lua: in function 'new'
+	E:/workspace/glory-openresty/src/check_token.lua:4: in function 'connect_redis'
+	E:/workspace/glory-openresty/src/check_token.lua:47: in function <E:/workspace/glory-openresty/src/check_token.lua:1>, client: 127.0.0.1, server: , request: "GET /checktoken HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:16:13 [error] 10836#6776: *1 lua entry thread aborted: runtime error: E:/workspace/glory-openresty/src/api.lua:77: module 'resty.http' not found:
+	no field package.preload['resty.http']
+	no file 'D:/softwares/openresty-1.13.6.2-win64/lualib/resty/lua-resty-redis/lib/resty\http.lua'
+	no file './site/lualib/resty\http.ljbc'
+	no file './site/lualib/resty\http/init.ljbc'
+	no file './lualib/resty\http.ljbc'
+	no file './lualib/resty\http/init.ljbc'
+	no file './site/lualib/resty\http.lua'
+	no file './site/lualib/resty\http/init.lua'
+	no file './lualib/resty\http.lua'
+	no file './lualib/resty\http/init.lua'
+	no file '.\resty\http.lua'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lualib\resty\http.lua'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lua\resty\http.lua'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lua\resty\http\init.lua'
+	no file './site/lualib/resty\http.so'
+	no file './lualib/resty\http.so'
+	no file '.\resty\http.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lualib\resty\http.so'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\resty\http.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\loadall.dll'
+	no file './site/lualib/resty.so'
+	no file './lualib/resty.so'
+	no file '.\resty.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lualib\resty.so'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\resty.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\loadall.dll'
+stack traceback:
+coroutine 0:
+	[C]: in function 'require'
+	E:/workspace/glory-openresty/src/api.lua:77: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:17:12 [error] 8776#6720: *1 lua entry thread aborted: runtime error: ./lualib/resty\redis.lua:58: attempt to call upvalue 'tcp' (a nil value)
+stack traceback:
+coroutine 0:
+	./lualib/resty\redis.lua: in function 'new'
+	E:/workspace/glory-openresty/src/api.lua:4: in function 'connect_redis'
+	E:/workspace/glory-openresty/src/api.lua:48: in function 'check_token'
+	E:/workspace/glory-openresty/src/api.lua:66: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:18:30 [error] 8952#8704: *1 lua entry thread aborted: runtime error: E:/workspace/glory-openresty/src/api.lua:77: module 'resty.http' not found:
+	no field package.preload['resty.http']
+	no file './site/lualib/resty\http.ljbc'
+	no file './site/lualib/resty\http/init.ljbc'
+	no file './lualib/resty\http.ljbc'
+	no file './lualib/resty\http/init.ljbc'
+	no file './site/lualib/resty\http.lua'
+	no file './site/lualib/resty\http/init.lua'
+	no file './lualib/resty\http.lua'
+	no file './lualib/resty\http/init.lua'
+	no file '.\resty\http.lua'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lualib\resty\http.lua'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lua\resty\http.lua'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lua\resty\http\init.lua'
+	no file './site/lualib/resty\http.so'
+	no file './lualib/resty\http.so'
+	no file '.\resty\http.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lualib\resty\http.so'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\resty\http.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\loadall.dll'
+	no file './site/lualib/resty.so'
+	no file './lualib/resty.so'
+	no file '.\resty.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\lualib\resty.so'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\resty.dll'
+	no file 'D:\softwares\openresty-1.13.6.2-win64\loadall.dll'
+stack traceback:
+coroutine 0:
+	[C]: in function 'require'
+	E:/workspace/glory-openresty/src/api.lua:77: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:21:26 [error] 6380#11072: *1 lua tcp socket connect timed out, when connecting to 49.4.8.123:8083, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:21:26 [error] 6380#11072: *1 lua entry thread aborted: runtime error: E:/workspace/glory-openresty/src/api.lua:88: attempt to index local 'res' (a nil value)
+stack traceback:
+coroutine 0:
+	E:/workspace/glory-openresty/src/api.lua: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:22:19 [error] 6380#11072: *4 lua tcp socket connect timed out, when connecting to 49.4.8.123:8083, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:22:19 [error] 6380#11072: *4 lua entry thread aborted: runtime error: E:/workspace/glory-openresty/src/api.lua:88: attempt to index local 'res' (a nil value)
+stack traceback:
+coroutine 0:
+	E:/workspace/glory-openresty/src/api.lua: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:24:57 [error] 4940#8704: *1 lua tcp socket connect timed out, when connecting to 49.4.8.123:8083, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:24:57 [error] 4940#8704: *1 lua entry thread aborted: runtime error: E:/workspace/glory-openresty/src/api.lua:88: attempt to index local 'res' (a nil value)
+stack traceback:
+coroutine 0:
+	E:/workspace/glory-openresty/src/api.lua: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /product/productList HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:27:41 [error] 4940#8704: *4 lua tcp socket connect timed out, when connecting to 49.4.8.123:8083, client: 127.0.0.1, server: , request: "GET /company/companyInfo?id=9 HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:27:41 [error] 4940#8704: *4 lua entry thread aborted: runtime error: E:/workspace/glory-openresty/src/api.lua:88: attempt to index local 'res' (a nil value)
+stack traceback:
+coroutine 0:
+	E:/workspace/glory-openresty/src/api.lua: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /company/companyInfo?id=9 HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:29:46 [error] 5960#10672: *1 lua tcp socket connect timed out, when connecting to 49.4.8.123:8083, client: 127.0.0.1, server: , request: "GET /company/companyInfo?id=9 HTTP/1.1", host: "localhost:8080"
+2019/01/09 17:29:46 [error] 5960#10672: *1 lua entry thread aborted: runtime error: E:/workspace/glory-openresty/src/api.lua:88: attempt to index local 'res' (a nil value)
+stack traceback:
+coroutine 0:
+	E:/workspace/glory-openresty/src/api.lua: in function <E:/workspace/glory-openresty/src/api.lua:1>, client: 127.0.0.1, server: , request: "GET /company/companyInfo?id=9 HTTP/1.1", host: "localhost:8080"
