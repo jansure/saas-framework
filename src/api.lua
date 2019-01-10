@@ -60,7 +60,6 @@ function check_token()
         return false
     end
     close_redis(rds)
-
 end
 
 local ok, err = check_token()
@@ -76,15 +75,13 @@ if ok then
     local inpath = ngx.var.request_uri
     local http = require("resty.http")
     local httpc = http:new()
-    local res, err = httpc:request_uri(
-        "http://49.4.8.123:8083",
+    local res, err = httpc:request_uri("http://49.4.8.123:8083",
         {
             path = inpath,
             method = inmethod,
             headers = inheaders,
             body = bodydata
-        }
-    )
+        })
     if res.status ~= ngx.HTTP_OK then
         ngx.exit(res.status)
     end
