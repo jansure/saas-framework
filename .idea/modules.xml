@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/glory-openresty.iml" filepath="$PROJECT_DIR$/glory-openresty.iml" />
+      <module fileurl="file://$PROJECT_DIR$/glory-soa-governance.iml" filepath="$PROJECT_DIR$/glory-soa-governance.iml" />
     </modules>
   </component>
 </project>
