@@ -1,0 +1,256 @@
+local vdata = {}
+local cjson = require("cjson")
+cjson.encode_keep_buffer = 0
+local unicode = require("unicode")
+local utf8 = require('lua-utf8')
+
+--- 函数：读取文件
+function getFile(file_name)
+    -- 以只读方式打开文件
+    local f = assert(io.open(file_name, 'r'))
+    -- 从当前位置读取整个文件
+    local string = f:read("*a")
+    -- 关闭打开的文件
+    f:close()
+    return string
+end
+
+--- 函数：拆分出单个字符
+local function stringToChars(str)
+    -- 主要用了Unicode(UTF-8)编码的原理分隔字符串
+    -- 简单来说就是每个字符的第一位定义了该字符占据了多少字节
+    -- UTF-8的编码：它是一种变长的编码方式
+    -- 对于单字节的符号，字节的第一位设为0，后面7位为这个符号的unicode码。因此对于英语字母，UTF-8编码和ASCII码是相同的。
+    -- 对于n字节的符号（n>1），第一个字节的前n位都设为1，第n+1位设为0，后面字节的前两位一律设为10。
+    -- 剩下的没有提及的二进制位，全部为这个符号的unicode码。
+    local list = {}
+    local len = string.len(str)
+    local i = 1
+    while i <= len do
+        local c = string.byte(str, i)
+        local shift = 1
+        if c > 0 and c <= 127 then
+            shift = 1
+        elseif (c >= 192 and c <= 223) then
+            shift = 2
+        elseif (c >= 224 and c <= 239) then
+            shift = 3
+        elseif (c >= 240 and c <= 247) then
+            shift = 4
+        end
+        local char = string.sub(str, i, i + shift - 1)
+        i = i + shift
+        table.insert(list, char)
+    end
+    return list, len
+end
+
+--- 函数：判断字符(UTF-8编码)是否为中文、韩文、日文
+local function isCJKCode(char)
+    if not char then
+        return false
+    end
+    local len = string.len(char)
+    local chInt = 0
+    for i = 1, len do
+        local n = string.byte(char, i)
+        chInt = chInt * 256 + n
+    end
+    return (chInt >= 14858880 and chInt <= 14860191) or (chInt >= 14860208 and chInt <= 14910399) or (chInt >= 14910592 and chInt <= 14911167) or (chInt >= 14911360 and chInt <= 14989247) or (chInt >= 14989440 and chInt <= 15318719) or (chInt >= 15380608 and chInt <= 15572655) or (chInt >= 15705216 and chInt <= 15707071) or (chInt >= 15710384 and chInt <= 15710607)
+end
+
+--- 建立tcp连接
+local tcpsock = ngx.socket.tcp()
+--local host = "49.4.8.123"
+--local port = 1688
+local host = "114.115.206.58"
+local port = 7000
+--local host = "103.46.128.41"
+--local port = 50686
+local ok, err = tcpsock:connect(host, port)
+if not ok then
+    ngx.log(ngx.ERR, "failed to connect tcp server:", err)
+    return
+end
+--- 3000 seconds timeout
+tcpsock:settimeouts(30000, 30000, 30000)
+
+local bytes
+
+local reqdata
+local reqdatalist = {}
+local reqdatalistlen
+reqdata = "{"
+local args_tab = ngx.req.get_uri_args()
+--- 拼接实际请求参数
+for k, v in pairs(args_tab) do
+    --ngx.log(ngx.ERR, "------k:", k)
+    -- 使用utf8编码
+    v = utf8.escape(v)
+    --ngx.log(ngx.ERR, "------v:", v)
+    reqdata = reqdata .. (string.format("\"%s\"", k)) .. ":" .. v .. ","
+end
+reqdata = string.sub(reqdata, 0, string.len(reqdata) - 1) .. "}"
+--ngx.log(ngx.ERR, "-----reqdata:", reqdata)
+-- 将带发送的字符串拆分成单个字符的数组
+reqdatalist, reqdatalistlen = stringToChars(reqdata)
+-- 遍历字符数组，将中文字符替换为其unicode编码值
+for i = 1, reqdatalistlen do
+    if (isCJKCode(reqdatalist[i])) then
+        reqdatalist[i] = unicode.encode(reqdatalist[i])
+        --ngx.log(ngx.ERR, "-----reqdatalist----:", reqdatalist[i])
+    end
+end
+-- 将字符数组转为字符串
+reqdata = table.concat(reqdatalist)
+--ngx.log(ngx.ERR, "-----reqdata table.concat(reqdatalist)----:", reqdata)
+
+-- 发送请求数据
+bytes, err = tcpsock:send(reqdata .. "\r\n\r\n")
+if err then
+    ngx.log(ngx.ERR, "failed to send request data to tcp server:", err)
+    return
+end
+ngx.log(ngx.ERR, "successfully send request data to tcp server:", bytes)
+
+-- 接收响应数据
+local resp_tmp1, err, part = tcpsock:receive()
+if (not resp_tmp1) and (err ~= 'timeout') then
+    ngx.log(ngx.ERR, "failed to receive response from tcp server:", err)
+    return nil, err
+end
+resp_tmp1 = resp_tmp1 or part
+if not resp_tmp1 then
+    ngx.log(ngx.ERR, "failed to receive response from tcp server:", err)
+    return nil, 'timeout'
+end
+ngx.log(ngx.ERR, "successfully receive response from tcp server:", resp_tmp1)
+-- 将响应解码为json格式
+vdata = cjson.decode(resp_tmp1)
+local resp = vdata["response"]
+
+if resp == "server_getfile_prepare" then
+    --- 新建项目请求接口（response值为server_getfile_prepare时上传文件）
+    -- 读取请求体body
+    ngx.req.read_body()
+    -- 读取请求体data
+    local bodydata = ngx.req.get_body_data()
+    ngx.log(ngx.ERR, "request data: ", bodydata)
+
+    -- 若请求体data为nil，说明数据超出限制，已被存入磁盘文件，使用get_body_file()函数获取
+    if nil == bodydata then
+        local file_name = ngx.req.get_body_file()
+        ngx.log(ngx.ERR, "request file_name: ", file_name)
+        if file_name then
+            bodydata = getFile(file_name)
+        end
+    end
+
+    -- 发送文件流到服务器
+    bytes, err = tcpsock:send(bodydata)
+    if err then
+        ngx.log(ngx.ERR, "failed to send bodydata to tcp server:", err)
+        return
+    end
+    ngx.log(ngx.ERR, "successfully send bodydata to tcp server:", bytes)
+
+    -- 接收响应
+    local resp_tmp2
+    repeat
+        resp_tmp2, err, part = tcpsock:receive()
+        if (not resp_tmp2) and (err ~= 'timeout') then
+            ngx.log(ngx.ERR, "failed to receive response from tcp server:", err)
+            break
+        end
+        resp_tmp2 = resp_tmp2 or part
+        if not resp_tmp2 then
+            ngx.log(ngx.ERR, "failed to receive response from tcp server:", err)
+            break
+        end
+        ngx.log(ngx.ERR, "successfully receive response from tcp server:", resp_tmp2)
+        --resp_tmp2_data = cjson.decode(resp_tmp2)
+        --ngx.log(ngx.ERR, "string.find(resp_tmp2,\"response\"):", string.find(resp_tmp2, "response"))
+    until (string.find(resp_tmp2, "response") ~= nil)
+    ngx.print(unicode.decode(resp_tmp2))
+
+elseif resp == "server_sendfile_prepare" then
+    --- 下载计算结果文件请求接口（response值为server_sendfile_prepare时服务端准备下发文件）
+    local filesize = vdata["file_size"]
+    --ngx.log(ngx.ERR, "---待接收文件大小filesize----:", filesize)
+    -- 客户端发送接收文件的标识{"response":"client_getfile_prepare"}
+    bytes, err = tcpsock:send("{\"response\":\"client_getfile_prepare\"}" .. "\r\n\r\n")
+    if err then
+        ngx.log(ngx.ERR, "failed to send client_getfile_prepare to tcp server:", err)
+        return
+    end
+    ngx.log(ngx.ERR, "successfully send client_getfile_prepare to tcp server:", bytes)
+
+    -- 客户端接收文件
+    local bufsize = 8192
+    local receivesize = 0
+    -- 先接收服务端发过来的4个字节\r\n\r\n
+    local first4, err = tcpsock:receive(4)
+    -- 开始接收文件内容
+    while not ngx.worker.exiting() do
+        if receivesize >= filesize then
+            ngx.log(ngx.ERR, "---已接收完毕----:", receivesize)
+            -- 发送接收文件完毕的标识{"response":"client_getfile_ok"}
+            bytes, err = tcpsock:send("{\"response\":\"client_getfile_ok\"}" .. "\r\n\r\n")
+            if err then
+                ngx.log(ngx.ERR, "failed to send client_getfile_ok to tcp server:", err)
+                return
+            end
+            ngx.log(ngx.ERR, "successfully send client_getfile_ok to tcp server:", bytes)
+
+            --- receive response
+            --local resp_tmp3
+            --repeat
+            --    resp_tmp3, err, part = tcpsock:receive()
+            --    if (not resp_tmp3) and (err ~= 'timeout') then
+            --        ngx.log(ngx.ERR, "failed to receive response from tcp server:", err)
+            --        break
+            --    end
+            --    resp_tmp3 = resp_tmp3 or part
+            --    if not resp_tmp3 then
+            --        ngx.log(ngx.ERR, "failed to receive response from tcp server:", err)
+            --        break
+            --    end
+            --    ngx.log(ngx.ERR, "successfully receive response from tcp server:", resp_tmp3)
+            --    --resp_tmp2_data = cjson.decode(resp_tmp2)
+            --    --ngx.log(ngx.ERR, "string.find(resp_tmp3,\"response\"):", string.find(resp_tmp3, "response"))
+            --until (string.find(resp_tmp3, "response") ~= nil)
+            --ngx.print(unicode.decode(resp_tmp3))
+
+            break
+        else
+            repeat
+                --接收数据
+                local line, err, partial = tcpsock:receive(bufsize)
+                line = line or partial
+
+                --timeout则继续接收数据
+                if (not line) and (err ~= 'timeout') then
+                    ngx.log(ngx.ERR, 'receive error:', err)
+                    return
+                end
+                if not line then
+                    ngx.log(ngx.ERR, 'line is nil.')
+                    break
+                end
+
+                --ngx.log(ngx.ERR, "---已接收line----:", line)
+                receivesize = receivesize + string.len(line)
+                --ngx.log(ngx.ERR, "---已接收大小----:", receivesize)
+                ngx.print(line)
+                ngx.flush(true)
+            until true
+        end
+    end
+else
+    --- 不涉及文件上传下载的接口，直接输出响应数据
+    -- 将响应中的unicode字符解码为utf8
+    ngx.print(unicode.decode(resp_tmp1))
+end
+tcpsock:send("bye \r\n\r\n")
+ngx.log(ngx.ERR, " send bye! ")
+tcpsock:close()
