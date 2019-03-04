@@ -13,6 +13,7 @@ elseif ua() then
 elseif url() then
 elseif args() then
 elseif cookie() then
+elseif denyClamav() then
 elseif PostCheck then
     if method=="POST" then   
             local boundary = get_boundary()

@@ -13,6 +13,7 @@ WhiteCheck = optionIsOn(whiteModule)
 PathInfoFix = optionIsOn(PathInfoFix)
 attacklog = optionIsOn(attacklog)
 CCDeny = optionIsOn(CCDeny)
+ClamavDeny = optionIsOn(ClamavDeny)
 Redirect=optionIsOn(Redirect)
 function getClientIp()
         IP  = ngx.var.remote_addr 
@@ -198,6 +199,23 @@ function denycc()
             end
         else
             limit:set(token,1,CCseconds)
+        end
+    end
+    return false
+end
+
+function denyClamav()
+    if ClamavDeny then
+        local uri = ngx.var.uri
+        local ClamavCount = tonumber(ClamavCount)
+        local token = getClientIp()..uri
+        local clamavlimit = ngx.shared.clamavlimit
+        local req, _ = clamavlimit:get(token)
+        if req then
+            if req >= ClamavCount then
+                 ngx.exit(503)
+                 return true
+            end
         end
     end
     return false
