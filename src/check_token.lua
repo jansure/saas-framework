@@ -9,7 +9,7 @@ function connect_redis()
     client:set_timeout(3000)
 
     local redis_info = {
-        host = "49.4.8.123",
+        host = "192.168.0.5",
         port = 26379,
         db = 0,
         password = "kongbaoping@cabrtech"
@@ -37,6 +37,9 @@ function close_redis(rediscli)
 end
 
 --check token api
+if ngx.var.request_method ~= "GET" then
+    ngx.exit(ngx.HTTP_FORBIDDEN)
+end
 local args = ngx.req.get_headers()
 local token_input = args["AuthToken"]
 if not token_input then
@@ -51,7 +54,7 @@ if not rds then
 end
 local ok, err = rds:exists(token_input)
 if ok == 1 then
-    ngx.say("token exists! " .. ok)
+    ngx.say("token exists! ")
 else
     ngx.status = ngx.HTTP_FORBIDDEN
     ngx.say("token not exists! ")

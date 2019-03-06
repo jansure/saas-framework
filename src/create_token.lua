@@ -9,7 +9,7 @@ function connect_redis()
     client:set_timeout(3000)
 
     local redis_info = {
-        host = "49.4.8.123",
+        host = "192.168.0.5",
         port = 26379,
         db = 0,
         password = "kongbaoping@cabrtech"
@@ -98,9 +98,6 @@ end
 
 --create token api
 local cjson = require "cjson.safe"
-if ngx.var.request_method == "GET" then
-    ngx.exit(ngx.HTTP_FORBIDDEN);
-end
 if ngx.var.request_method == "POST" then
     ngx.req.read_body()
     local bodydata = cjson.decode(ngx.req.get_body_data())
@@ -123,5 +120,7 @@ if ngx.var.request_method == "POST" then
             ngx.exit(ngx.HTTP_CREATED);
         end
     end
+else
+    ngx.exit(ngx.HTTP_FORBIDDEN);
 end
 
