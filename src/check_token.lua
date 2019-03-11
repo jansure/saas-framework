@@ -37,27 +37,31 @@ function close_redis(rediscli)
 end
 
 --check token api
-if ngx.var.request_method ~= "GET" then
-    ngx.exit(ngx.HTTP_FORBIDDEN)
-end
+--if ngx.var.request_method ~= "GET" then
+--    ngx.exit(ngx.HTTP_FORBIDDEN)
+--end
 local args = ngx.req.get_headers()
 local token_input = args["AuthToken"]
+ngx.log(ngx.STDERR, "AuthToken: " .. (token_input or "nil"))
 if not token_input then
     ngx.status = ngx.HTTP_FORBIDDEN
-    ngx.say("Only Authorized Request Will be Processed!")
+    ngx.say("{\"response\":\"Only Authorized Request Will be Processed!\"}")
     ngx.exit(ngx.HTTP_FORBIDDEN)
 end
 local rds = connect_redis()
 if not rds then
-    ngx.say("connect redis error.")
+    ngx.status = ngx.HTTP_BAD_REQUEST
+    ngx.say("{\"response\":\"connect redis error.\"}")
     ngx.exit(ngx.HTTP_BAD_REQUEST)
 end
 local ok, err = rds:exists(token_input)
 if ok == 1 then
-    ngx.say("token exists! ")
+    ngx.status = ngx.HTTP_OK
+    ngx.say("{\"response\":\"token exists!\"}")
+    ngx.exit(ngx.HTTP_OK)
 else
-    ngx.status = ngx.HTTP_FORBIDDEN
-    ngx.say("token not exists! ")
-    ngx.exit(ngx.HTTP_FORBIDDEN)
+    ngx.status = ngx.HTTP_OK
+    ngx.say("{\"response\":\"token not exists!\"}")
+    ngx.exit(ngx.HTTP_OK)
 end
 close_redis(rds)

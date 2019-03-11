@@ -76,7 +76,7 @@ function save_token(token, username)
     end
     --add expire time 600s
     rds:expire(token, "600")
-    ngx.say("save token result: " .. ok)
+    --ngx.say("{\"response\":\"save token result: success! expire in 600s. \"}")
     close_redis(rds)
 end
 
@@ -108,7 +108,7 @@ if ngx.var.request_method == "POST" then
         --ngx.say("post param password:", password)
         local auth = auth_user(username, password)
         if not auth then
-            ngx.say("用户名或密码错误！")
+            ngx.say("{\"response\":\"用户名或密码错误！\"}")
             ngx.exit(ngx.HTTP_BAD_REQUEST);
         else
             local timestamp = ngx.now()
@@ -123,4 +123,3 @@ if ngx.var.request_method == "POST" then
 else
     ngx.exit(ngx.HTTP_FORBIDDEN);
 end
-
