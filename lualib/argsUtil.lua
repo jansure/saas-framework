@@ -2,10 +2,12 @@ local _M = {
     _VERSION = '0.10'
 }
 
+local inspect = require "inspect"
 local args = {}
 local file_args = {}
 local is_have_file_param = false
 local error_code, error_msg
+local body_data
 --- 以分隔符为准，将字符串分隔为table，table的key为1/2/3等，value为分隔出的字符串
 local function explode(_str, seperator)
     local pos, arr = 0, {}
@@ -31,7 +33,8 @@ function _M.init_form_args()
         if content_type ~= nil and string.sub(content_type, 1, 20) == "multipart/form-data;" then
             ngx.log(ngx.ERR, "------是multipart/form-data类型的表单------")
             --body_data可是符合http协议的请求体，不是普通的字符串
-            local body_data = ngx.req.get_body_data()
+            body_data = ngx.req.get_body_data()
+            print(body_data)
 
             --请求体的size大于nginx配置里的client_body_buffer_size，则会导致请求体被缓冲到磁盘临时文件里，client_body_buffer_size默认是8k或者16k
             if not body_data then
@@ -46,11 +49,12 @@ function _M.init_form_args()
                         error_code = 2
                         error_msg = "failed to open " .. tostring(datafile) .. "for reading: " .. tostring(err)
                     else
-                        --fh:seek("set")
-                        --body_data = fh:read("*a")
-                        local filesize = fh:seek("end")
+                        fh:seek("set")
+                        body_data = fh:read("*a")
+                        --local filesize = fh:seek("end")
                         fh:close()
-                        if filesize == "0" then
+                        --if filesize == "0" then
+                        if body_data == "" then
                             error_code = 3
                             error_msg = "request body is empty"
                         end
@@ -81,13 +85,16 @@ function _M.init_form_args()
                         --文件类型的参数，capture是参数名称，capture2是文件名
                         file_args[capture] = capture2
                         table.insert(new_body_data, v)
+                        --print(inspect(new_body_data))
                     end
                 end
                 table.insert(new_body_data, 1, first_string)
                 table.insert(new_body_data, last_string)
+                --print(table.concat(new_body_data, ", "))
                 --去掉app_key,app_secret等几个参数，把业务级别的参数传给内部的API
                 --body_data可是符合http协议的请求体，不是普通的字符串
                 body_data = table.concat(new_body_data, boundary)
+                --print(body_data)
             end
         else
             ngx.log(ngx.ERR, "------非multipart/form-data类型的表单------")
@@ -96,7 +103,7 @@ function _M.init_form_args()
             file_args = {}
         end
     end
-    return args, is_have_file_param, file_args
+    return args, is_have_file_param, file_args, body_data
 end
 
 function _M.split(self, s, delim)
