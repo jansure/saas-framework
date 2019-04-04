@@ -54,7 +54,10 @@ function shell.execute(cmd, args)
 
         -- status code
         local data, err, partial = sock:receive('*l')
-        --ngx.log(ngx.ERR, "---receive data ----" .. data)
+        if nil == data then
+            return -1, nil, err
+        end
+        ngx.log(ngx.ERR, "---receive status code ----" .. data)
         if err then
             return -1, nil, err
         end
@@ -63,6 +66,7 @@ function shell.execute(cmd, args)
 
         -- output stream
         data, err, partial = sock:receive('*l')
+        --ngx.log(ngx.ERR, "---receive output stream ----" .. data)
         if err then
             return -1, nil, err
         end
@@ -71,6 +75,7 @@ function shell.execute(cmd, args)
 
         -- error stream
         data, err, partial = sock:receive('*l')
+        --ngx.log(ngx.ERR, "---receive error stream ----" .. data)
         if err then
             return -1, nil, err
         end
