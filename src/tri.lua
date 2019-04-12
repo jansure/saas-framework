@@ -23,9 +23,17 @@ end
 cmd = local_args["cmd_path"]
 param = local_args["cmd_param"]
 
+if nil == param then
+	ngx.say("cmd_param参数不能为空！\n")
+end
+
+-- 生成一个随机标识，用于修改进程名称
+--local param_c = " -c 12345"
+local param_n = " -n wwwww"
 local args = {
 	socket = "unix:/tmp/shell.sock",  --这是第一步的unxi socket
-	data = param .. "\r\n",
+	--data = param .. param_c .. param_n .. " & " .. "\r\n",
+	data = param .. param_n .. " & " .. "\r\n",
 }
 
 if nil ~= cmd then
@@ -34,7 +42,7 @@ if nil ~= cmd then
 	if nil == out then
 		ngx.say("Result:\n" .. status .. "\n" .. err)                    -- 命令输出结果
 	else
-		ngx.say("Result:\n" .. out)                    -- 命令输出结果
+		ngx.say("Result:\n" .. out .. "\n" .. param_n)                    -- 命令输出结果
 	end
 else
 	ngx.say("cmd_path参数不能为空！\n")
