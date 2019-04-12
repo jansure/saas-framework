@@ -1,5 +1,6 @@
 local shell = require ("resty.shell")
 local multipart = require ("multipart")
+local guid = require ("guid")
 
 local cmd
 local param
@@ -21,12 +22,13 @@ if nil == param then
 end
 
 -- 生成一个随机标识，用于修改进程名称
+local param_n = guid.generate()
 --local param_c = " -c 12345"
-local param_n = " -n wwwww"
+--local param_n = " -n wwwww"
 local args = {
 	socket = "unix:/tmp/shell.sock",  --这是第一步的unxi socket
 	--data = param .. param_c .. param_n .. " & " .. "\r\n",
-	data = param .. param_n .. " & " .. "\r\n",
+	data = param .. " -n " .. param_n .. " & " .. "\r\n",
 }
 
 if nil ~= cmd then
@@ -35,7 +37,7 @@ if nil ~= cmd then
 	if nil == out then
 		ngx.say("Result:\n" .. status .. "\n" .. err)                    -- 命令输出结果
 		if "timeout" == err then
-			ngx.say("process name :\n" .. param_n)
+			ngx.say("process name : tri-" .. param_n)
 		end
 	else
 		ngx.say("Result:\n" .. out)                    -- 命令输出结果

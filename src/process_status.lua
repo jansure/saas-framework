@@ -4,9 +4,9 @@ local argsUtil = require('argsUtil')
 local cmd
 local param
 -- 查询进程且不显示当前grep进程
-cmd = "ps -ef |grep -v grep |grep "
+--cmd = "ps -ef |grep -v grep |grep "
 -- "-C"必须提供精确的进程名，并且它并不能通过部分名字或者通配符查找
---cmd = "ps -C "
+cmd = "ps -C "
 
 -- 读取get请求参数
 local local_args = ngx.req.get_uri_args()
