@@ -67,7 +67,7 @@ int main (int argc, char* argv[])
     while((ch = getopt(argc, argv, "n:")) != -1) {
         switch(ch) {
             case 'n':
-                printf("option n: %s\n", optarg);
+                printf("option n (modified process name): %s\n", optarg);
                 name = optarg;
                 break;
             case '?': //  ?
