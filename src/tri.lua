@@ -38,7 +38,7 @@ local args = {
 
 if nil ~= cmd then
 	local status, out, err = shell.execute(cmd, args)
-	ngx.header.content_type = "text/plain"
+	ngx.header.content_type = "text/plain; charset=utf-8"
 	if nil == out then
 		ngx.say("Result:\n" .. status .. "\n" .. err)                    -- 命令输出结果
 	else

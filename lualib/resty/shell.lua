@@ -41,7 +41,9 @@ function shell.execute(cmd, args)
         ok, err = sock:connect(socket)
     end
     if ok then
-        sock:settimeout(timeout or 15000)
+        --sock:settimeout(timeout or 15000)
+        --sock:settimeouts(connect_timeout, send_timeout, read_timeout)单位毫秒
+        sock:settimeouts(timeout or 15000, 5000, 3000)
         --sock:send(cmd .. "\r\n")
         sock:send(cmd .. " ")
         --sock:send(format("%d\r\n", #input_data))
@@ -54,8 +56,9 @@ function shell.execute(cmd, args)
 
         -- status code
         local data, err, partial = sock:receive('*l')
+        -- 超时（请求超时或进程执行时间超时）
         if nil == data then
-            return -1, nil, err
+            return 1, nil, "请求已发送，请另行查看进程状态"
         end
         ngx.log(ngx.ERR, "---receive status code ----" .. data)
         if err then

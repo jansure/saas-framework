@@ -23,7 +23,7 @@ local args = {
 }
 
 local status, out, err = shell.execute(cmd, args)
-ngx.header.content_type = "text/plain"
+ngx.header.content_type = "text/plain; charset=utf-8"
 if nil == out then
 	ngx.say("Result:\n" .. status)                    -- 命令输出结果
 	if err then
