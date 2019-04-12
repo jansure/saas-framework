@@ -56,9 +56,9 @@ function shell.execute(cmd, args)
 
         -- status code
         local data, err, partial = sock:receive('*l')
-        -- 超时（请求超时或进程执行时间超时）
+        -- 超时（请求超时或进程执行时间超时）err="timeout"
         if nil == data then
-            return 1, nil, "请求已发送，请另行查看进程状态"
+            return 1, nil, err
         end
         ngx.log(ngx.ERR, "---receive status code ----" .. data)
         if err then

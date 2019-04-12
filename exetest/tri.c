@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     getchar();
 
     // 进程挂起5分钟，用于模拟计算时间长的进程
-    //sleep(300);
+    sleep(300);
 	return 0;
 }
 
