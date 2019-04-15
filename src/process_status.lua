@@ -24,11 +24,16 @@ local args = {
 
 local status, out, err = shell.execute(cmd, args)
 ngx.header.content_type = "text/plain; charset=utf-8"
+--ngx.say("process shell status:\n" .. status)
+
 if nil == out then
 	ngx.say("Result:\n" .. status)                    -- 命令输出结果
 	if err then
 		ngx.say("\n" .. "err:\n"  .. err)
 	end
 else
+	if 256 == status then
+		ngx.say("Result: 此进程不存在\n")
+	end
 	ngx.say("Result:\n" .. out)                    -- 命令输出结果
 end
