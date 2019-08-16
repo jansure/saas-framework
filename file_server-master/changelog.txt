@@ -1,0 +1,66 @@
+v 096
+---
+
+- Initial keyboard support...
+  . Navigate list with <j><k>
+  . Opoen dirs with <o>
+  . Open finder with <s>
+  . Go home/root with <h>
+  . <x> will select an element
+  . <d> will delete selected elements
+  . Edit file with <e>
+  When editing a file...
+    <Ctrl+s> will save the file
+    <Esc>Will leave editor mode
+
+
+v 095
+--
+- assets files, neede by client app, served with gzip
+- Added param for handling auth -auth="username:password"
+- Added param for defining depth of initial dir traverse --depth
+- Refactored code in Static serving
+- Refactored code in gzip handler.. for not handling image archives..
+
+
+
+v 094
+--
+- Improved ui for mobile clients
+
+
+v 093a
+--
+- Added a quick fuzzy directory search on the main bar, for easy navigation
+throught shared folders.
+-
+
+
+v.092b
+--
+- When enabled inline edition of filenames, created a bug, with $location.
+- From inside a directive, it does not work. 
+
+
+v.092a
+----
+
+- Added button to ad new files
+- Rename files from inside the list
+
+Backend:
+    - Refactor actions, with command pattern.
+    - Writed tests on commands
+    - Json list, detect text files. Added property at File{IsText}
+
+Frontend: UI
+    Features:
+    - Edit files with codemirror
+    - Compress files in tar.gz
+    - Copy files
+
+    Refactor:
+    - Flash messenger as a service
+    - Data Commands, as a service ServerCommand
+    - Multiselect items, and action for deleting them
+    
